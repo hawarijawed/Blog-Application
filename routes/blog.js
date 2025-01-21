@@ -3,6 +3,7 @@ const multer = require("multer");
 const path = require("path");
 
 const Blog = require("../models/blog");
+const Comment = require("../models/comment");
 const router = express.Router();
 
 //Handling uploaded cover images
@@ -23,6 +24,32 @@ router.get("/add-new", (req, res)=>{
         user: req.user,
     });
 });
+
+//get the blog by id
+router.get("/:id", async(req, res)=>{
+  const allBlog = await Blog.findById(req.params.id).populate("createdBy");
+  const comments = await Comment.find({blogId:req.params.id}).populate(
+    "createdBy"
+  );
+  console.log("comments: ", comments);
+  return res.render("blog",{
+    user: req.user,
+    blog:allBlog,
+    comments,
+  });
+});
+
+//Route for comment
+router.post("/comment/:blogId", async(req, res)=>{
+    await Comment.create({
+      comment: req.body.comment,
+      blogId: req.params.blogId,
+      createdBy: req.user._id,
+    });
+
+    return res.redirect(`/blog/${req.params.blogId}`);
+});
+
 
 router.post("/", upload.single('coverImage'), async(req,res)=>{
     const {title, content} = req.body;
