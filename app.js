@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const mognoos = require("mongoose");
 const path = require("path")
@@ -7,13 +8,14 @@ const { default: mongoose } = require("mongoose");
 const cookieParser = require("cookie-parser");
 const { checkForAuthenticationCookie } = require("./middlewares/authentication");
 const Blog = require("./models/blog");
+const { configDotenv } = require("dotenv");
 
 
 const app = express();
-const PORT = 8002;
+const PORT = process.env.PORT || 8002;
 
-//Connecting to database
-mongoose.connect("mongodb://localhost:27017/Blogify")
+//Connecting to database mongodb://localhost:27017/Blogify
+mongoose.connect(process.env.MONGO_URL)
 .then(()=>console.log("Database connected Successfully"));
 app.set("view engine", "ejs");
 app.set("views", path.resolve("./views"));
